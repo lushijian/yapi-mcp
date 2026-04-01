@@ -1,8 +1,7 @@
 export interface YapiConfig {
   baseUrl: string;
-  token?: string;
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
 }
 
 export interface YapiLoginResponse {

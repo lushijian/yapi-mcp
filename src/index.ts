@@ -10,9 +10,8 @@ import { YapiClient } from "./client.js";
 
 interface Config {
   baseUrl: string;
-  token?: string;
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
 }
 
 // 尝试从配置文件读取配置
@@ -44,25 +43,23 @@ function loadConfig(): Config | null {
 // 从环境变量或配置文件获取配置
 const fileConfig = loadConfig();
 const YAPI_BASE_URL = process.env.YAPI_BASE_URL || fileConfig?.baseUrl;
-const YAPI_TOKEN = process.env.YAPI_TOKEN || fileConfig?.token;
 const YAPI_EMAIL = process.env.YAPI_EMAIL || fileConfig?.email;
 const YAPI_PASSWORD = process.env.YAPI_PASSWORD || fileConfig?.password;
 
 if (!YAPI_BASE_URL) {
-  console.error("Error: YAPI_BASE_URL is required. Set it via environment variable or yapi-mcp.config.json");
+  console.error("Error: YAPI_BASE_URL is required. Set it via environment variable or yapi-interface-mcp.config.json");
   process.exit(1);
 }
 
-if (!YAPI_TOKEN && !(YAPI_EMAIL && YAPI_PASSWORD)) {
-  console.error("Error: Either YAPI_TOKEN or both YAPI_EMAIL and YAPI_PASSWORD are required");
-  console.error("You can set them via environment variables or create a yapi-mcp.config.json file");
+if (!YAPI_EMAIL || !YAPI_PASSWORD) {
+  console.error("Error: YAPI_EMAIL and YAPI_PASSWORD are required");
+  console.error("You can set them via environment variables or create a yapi-interface-mcp.config.json file");
   process.exit(1);
 }
 
 // 创建 YAPI 客户端
 const yapiClient = new YapiClient({
   baseUrl: YAPI_BASE_URL,
-  token: YAPI_TOKEN,
   email: YAPI_EMAIL,
   password: YAPI_PASSWORD,
 });

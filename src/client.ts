@@ -13,21 +13,13 @@ import type {
 
 export class YapiClient {
   private baseUrl: string;
-  private token: string | null = null;
   private cookies: string | null = null;
+  private loginCredentials: { email: string; password: string };
 
   constructor(config: YapiConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
-    if (config.token) {
-      this.token = config.token;
-    }
-    // 存储登录凭据以便延迟登录
-    this.loginCredentials = config.email && config.password
-      ? { email: config.email, password: config.password }
-      : null;
+    this.loginCredentials = { email: config.email, password: config.password };
   }
-
-  private loginCredentials: { email: string; password: string } | null = null;
 
   /**
    * 通过邮箱和密码登录，获取 cookie
@@ -94,21 +86,14 @@ export class YapiClient {
   }
 
   /**
-   * 确保已登录（有 token 或 cookies）
+   * 确保已登录（有 cookies）
    */
   private async ensureAuthenticated(): Promise<void> {
-    if (this.token || this.cookies) {
+    if (this.cookies) {
       return;
     }
 
-    if (this.loginCredentials) {
-      await this.login(this.loginCredentials.email, this.loginCredentials.password);
-      if (this.cookies) {
-        return;
-      }
-    }
-
-    throw new Error("YAPI authentication is required. Please provide token or email/password to login.");
+    await this.login(this.loginCredentials.email, this.loginCredentials.password);
   }
 
   private async request<T>(
@@ -121,20 +106,11 @@ export class YapiClient {
     await this.ensureAuthenticated();
 
     const url = new URL(`${this.baseUrl}${path}`);
-    
-    // 如果有 token，添加到 URL 参数
-    if (this.token) {
-      url.searchParams.set("token", this.token);
-    }
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
+      "Cookie": this.cookies!,
     };
-
-    // 如果有 cookies，添加到请求头
-    if (this.cookies) {
-      headers["Cookie"] = this.cookies;
-    }
 
     const fetchOptions: RequestInit = {
       method: options.method || "GET",

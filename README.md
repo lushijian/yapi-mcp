@@ -7,7 +7,7 @@
 - 🔍 **项目查询** - 获取项目信息和项目列表
 - 📂 **分类管理** - 查询接口分类、新增分类
 - 📋 **接口管理** - 查询接口列表、接口详情、新增接口、修改接口
-- 🔐 **多种认证方式** - 支持 Cookie 认证（邮箱密码登录）和 Token 认证
+- 🔐 **Cookie 认证** - 通过邮箱密码登录自动获取认证
 
 ## 安装
 
@@ -37,25 +37,13 @@ npm run build
 }
 ```
 
-或者使用 Token 认证：
-
-```json
-{
-  "baseUrl": "http://your-yapi-server:3000",
-  "token": "your-yapi-token"
-}
-```
-
 ### 方式二：环境变量
 
 | 环境变量 | 说明 | 必填 |
 |---------|------|------|
 | `YAPI_BASE_URL` | YAPI 服务器地址 | ✅ |
-| `YAPI_EMAIL` | 登录邮箱 | 二选一 |
-| `YAPI_PASSWORD` | 登录密码 | 二选一 |
-| `YAPI_TOKEN` | YAPI Token | 二选一 |
-
-> 💡 认证方式优先级：Token > Cookie（邮箱密码登录）
+| `YAPI_EMAIL` | 登录邮箱 | ✅ |
+| `YAPI_PASSWORD` | 登录密码 | ✅ |
 
 ## 使用方式
 
@@ -190,8 +178,7 @@ npm start
 ## 注意事项
 
 1. **安全性** - 配置文件 `yapi-interface-mcp.config.json` 包含敏感信息，请勿提交到版本控制系统。已添加到 `.gitignore`。
-2. **认证方式** - 推荐使用邮箱密码登录（Cookie 认证），YAPI 的 Token 认证可能有权限限制。
-3. **网络访问** - 确保 MCP 服务器能够访问 YAPI 服务器。
+2. **网络访问** - 确保 MCP 服务器能够访问 YAPI 服务器。
 
 ## License
 
