@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config files (may contain sensitive data)
+yapi-interface-mcp.config.json
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Qoder
+.qoder/
