@@ -64,13 +64,48 @@ const yapiClient = new YapiClient({
   password: YAPI_PASSWORD,
 });
 
+// 从 package.json 读取版本
+function getVersion(): string {
+  try {
+    const packagePath = join(dirname(fileURLToPath(import.meta.url)), "..", "package.json");
+    const packageContent = readFileSync(packagePath, "utf-8");
+    const packageJson = JSON.parse(packageContent);
+    return packageJson.version || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+const VERSION = getVersion();
+
 // 创建 MCP 服务器
 const server = new McpServer({
-  name: "yapi-mcp",
-  version: "1.0.0",
+  name: "yapi-interface-mcp",
+  version: VERSION,
 });
 
 // ==================== 工具定义 ====================
+
+// 0. 获取版本信息
+server.tool(
+  "yapi-get-version",
+  "获取 YAPI MCP Server 版本信息",
+  {},
+  async () => {
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify({
+            name: "yapi-interface-mcp",
+            version: VERSION,
+            description: "YAPI MCP Server - 支持 Cookie 认证，查询项目、接口列表、接口分类、接口详情，新增和修改接口",
+          }, null, 2),
+        },
+      ],
+    };
+  }
+);
 
 // 1. 获取项目信息
 server.tool(
