@@ -277,6 +277,7 @@ server.tool(
     path: z.string().describe("接口路径，如 /api/user"),
     method: z.enum(["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"]).describe("请求方法"),
     catid: z.number().describe("分类ID"),
+    project_id: z.number().describe("项目ID"),
     desc: z.string().optional().describe("接口描述"),
     status: z.enum(["done", "designing", "dev", "undone"]).optional().describe("接口状态"),
     req_body_type: z.enum(["form", "json", "file", "raw", "text"]).optional().describe("请求体类型"),
@@ -315,7 +316,13 @@ server.tool(
   },
   async (params) => {
     try {
-      const result = await yapiClient.createInterface(params);
+      // 确保数字类型参数正确转换
+      const interfaceParams = {
+        ...params,
+        catid: typeof params.catid === 'string' ? parseInt(params.catid, 10) : params.catid,
+        project_id: typeof params.project_id === 'string' ? parseInt(params.project_id, 10) : params.project_id,
+      };
+      const result = await yapiClient.createInterface(interfaceParams);
       return {
         content: [
           {
@@ -387,7 +394,13 @@ server.tool(
   },
   async (params) => {
     try {
-      const result = await yapiClient.updateInterface(params);
+      // 确保数字类型参数正确转换
+      const interfaceParams = {
+        ...params,
+        id: typeof params.id === 'string' ? parseInt(params.id, 10) : params.id,
+        catid: params.catid ? (typeof params.catid === 'string' ? parseInt(params.catid, 10) : params.catid) : undefined,
+      };
+      const result = await yapiClient.updateInterface(interfaceParams);
       return {
         content: [
           {

@@ -14,6 +14,7 @@ import type {
 export class YapiClient {
   private baseUrl: string;
   private cookies: string | null = null;
+  private uid: number | null = null;
   private loginCredentials: { email: string; password: string };
 
   constructor(config: YapiConfig) {
@@ -52,6 +53,12 @@ export class YapiClient {
       if (cookies.length > 0) {
         this.cookies = cookies.join("; ");
         console.error(`[yapi-mcp] Login successful, cookies: ${cookies.length} found`);
+        // 从响应中获取 uid
+        const data = (await response.clone().json()) as YapiApiResponse<YapiLoginResponse>;
+        if (data.data?.uid) {
+          this.uid = data.data.uid;
+          console.error(`[yapi-mcp] User uid: ${this.uid}`);
+        }
         return;
       }
     }
@@ -72,6 +79,12 @@ export class YapiClient {
       if (cookies.length > 0) {
         this.cookies = cookies.join("; ");
         console.error(`[yapi-mcp] Login successful (fallback), cookies: ${cookies.length} found`);
+        // 从响应中获取 uid
+        const data = (await response.clone().json()) as YapiApiResponse<YapiLoginResponse>;
+        if (data.data?.uid) {
+          this.uid = data.data.uid;
+          console.error(`[yapi-mcp] User uid: ${this.uid}`);
+        }
         return;
       }
     }
@@ -199,11 +212,16 @@ export class YapiClient {
    * @param params 接口参数
    */
   async createInterface(params: CreateInterfaceParams): Promise<YapiInterfaceDetail> {
+    await this.ensureAuthenticated();
+    const body = {
+      ...params,
+      uid: this.uid,
+    } as Record<string, unknown>;
     const response = await this.request<YapiInterfaceDetail>(
       "/api/interface/save",
       {
         method: "POST",
-        body: params as unknown as Record<string, unknown>,
+        body,
       }
     );
     return response.data;
@@ -214,11 +232,16 @@ export class YapiClient {
    * @param params 接口参数
    */
   async updateInterface(params: UpdateInterfaceParams): Promise<YapiInterfaceDetail> {
+    await this.ensureAuthenticated();
+    const body = {
+      ...params,
+      uid: this.uid,
+    } as Record<string, unknown>;
     const response = await this.request<YapiInterfaceDetail>(
       "/api/interface/up",
       {
         method: "POST",
-        body: params as unknown as Record<string, unknown>,
+        body,
       }
     );
     return response.data;
