@@ -46,24 +46,39 @@ type YapiCategory struct {
 }
 
 type YapiInterface struct {
-	ID          int    `json:"_id"`
-	Title       string `json:"title"`
-	Path        string `json:"path"`
-	Method      string `json:"method"`
-	ProjectID   int    `json:"project_id"`
-	CatID       int    `json:"catid"`
-	UID         int    `json:"uid"`
-	AddTime     int64  `json:"add_time"`
-	UpTime      int64  `json:"up_time"`
-	Desc        string `json:"desc"`
-	Status      string `json:"status"`
-	ReqBodyType string `json:"req_body_type"`
+	ID                 int                `json:"_id"`
+	Title              string             `json:"title"`
+	Path               string             `json:"path"`
+	Method             string             `json:"method"`
+	ProjectID          int                `json:"project_id"`
+	CatID              int                `json:"catid"`
+	UID                int                `json:"uid"`
+	AddTime            int64              `json:"add_time"`
+	UpTime             int64              `json:"up_time"`
+	Desc               string             `json:"desc"`
+	Status             string             `json:"status"`
+	ReqBodyType        string             `json:"req_body_type"`
+	ReqBodyOther       string             `json:"req_body_other"`
+	ResBody            string             `json:"res_body"`
+	ResBodyType        string             `json:"res_body_type"`
+	ReqBodyIsJsonSchema bool              `json:"req_body_is_json_schema"`
+	ResBodyIsJsonSchema bool              `json:"res_body_is_json_schema"`
+	ReqHeaders         []any              `json:"req_headers"`
+	ReqQuery           []any              `json:"req_query"`
+	ReqParams          []any              `json:"req_params"`
+	ReqBodyForm        []any              `json:"req_body_form"`
+	Tag                []string           `json:"tag"`
+	Type               string             `json:"type"`
+	APIOpened          bool               `json:"api_opened"`
+	EditUID            int                `json:"edit_uid"`
+	Index              int                `json:"index"`
 }
 
 type YapiInterfaceDetail struct {
 	YapiInterface
-	Username string `json:"username"`
-	Editor   string `json:"editor,omitempty"`
+	Username   string `json:"username"`
+	Editor     string `json:"editor,omitempty"`
+	QueryPath  any    `json:"query_path,omitempty"`
 }
 
 type yapiApiResponse[T any] struct {
@@ -254,7 +269,7 @@ func (c *YapiClient) GetInterface(id int) (*YapiInterfaceDetail, error) {
 
 func (c *YapiClient) CreateInterface(params map[string]any) (*YapiInterfaceDetail, error) {
 	params["uid"] = c.uid
-	body, err := c.request("/api/interface/save", "POST", params)
+	body, err := c.request("/api/interface/add", "POST", params)
 	if err != nil {
 		return nil, err
 	}
@@ -266,16 +281,16 @@ func (c *YapiClient) CreateInterface(params map[string]any) (*YapiInterfaceDetai
 }
 
 func (c *YapiClient) UpdateInterface(params map[string]any) (*YapiInterfaceDetail, error) {
-	params["uid"] = c.uid
 	body, err := c.request("/api/interface/up", "POST", params)
 	if err != nil {
 		return nil, err
 	}
-	var resp yapiApiResponse[YapiInterfaceDetail]
+	// /api/interface/up returns {"errcode":0,"data":{"n":1,...}} (MongoDB result)
+	var resp yapiApiResponse[json.RawMessage]
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, fmt.Errorf("parse response: %w", err)
 	}
-	return &resp.Data, nil
+	return &YapiInterfaceDetail{}, nil
 }
 
 func (c *YapiClient) CreateCategory(params map[string]any) (*YapiCategory, error) {

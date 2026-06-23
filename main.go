@@ -240,8 +240,30 @@ func main() {
 		mcp.WithString("method", mcp.Required(), mcp.Description("请求方法")),
 		mcp.WithNumber("catid", mcp.Required(), mcp.Description("分类ID")),
 		mcp.WithNumber("project_id", mcp.Required(), mcp.Description("项目ID")),
+		mcp.WithString("desc", mcp.Description("接口描述")),
+		mcp.WithString("req_body_type", mcp.Description("请求体类型：json/form/text/raw")),
+		mcp.WithString("req_body_other", mcp.Description("请求体 JSON Schema 或示例")),
+		mcp.WithString("res_body", mcp.Description("响应体 JSON Schema 或示例")),
+		mcp.WithString("res_body_type", mcp.Description("响应体类型：json/form/text/raw")),
+		mcp.WithBoolean("req_body_is_json_schema", mcp.Description("请求体是否为 JSON Schema")),
+		mcp.WithBoolean("res_body_is_json_schema", mcp.Description("响应体是否为 JSON Schema")),
+		mcp.WithString("tag", mcp.Description("标签，JSON 数组格式，如 [\"tag1\",\"tag2\"]")),
+		mcp.WithString("req_headers", mcp.Description("请求头，JSON 数组格式，如 [{\"name\":\"Content-Type\",\"value\":\"application/json\"}]")),
 	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		args := req.GetArguments()
+		// parse JSON string args to native types
+		if tag, ok := args["tag"].(string); ok && tag != "" {
+			var tags []string
+			if json.Unmarshal([]byte(tag), &tags) == nil {
+				args["tag"] = tags
+			}
+		}
+		if headers, ok := args["req_headers"].(string); ok && headers != "" {
+			var hdrs []any
+			if json.Unmarshal([]byte(headers), &hdrs) == nil {
+				args["req_headers"] = hdrs
+			}
+		}
 		result, err := client.CreateInterface(args)
 		if err != nil {
 			return errorResult(err.Error()), nil
@@ -253,8 +275,34 @@ func main() {
 	s.AddTool(mcp.NewTool("yapi-update-interface",
 		mcp.WithDescription("修改 YAPI 接口"),
 		mcp.WithNumber("id", mcp.Required(), mcp.Description("接口ID")),
+		mcp.WithString("title", mcp.Description("接口标题")),
+		mcp.WithString("path", mcp.Description("接口路径")),
+		mcp.WithString("method", mcp.Description("请求方法")),
+		mcp.WithNumber("catid", mcp.Description("分类ID")),
+		mcp.WithNumber("project_id", mcp.Description("项目ID")),
+		mcp.WithString("desc", mcp.Description("接口描述")),
+		mcp.WithString("req_body_type", mcp.Description("请求体类型：json/form/text/raw")),
+		mcp.WithString("req_body_other", mcp.Description("请求体 JSON Schema 或示例")),
+		mcp.WithString("res_body", mcp.Description("响应体 JSON Schema 或示例")),
+		mcp.WithString("res_body_type", mcp.Description("响应体类型：json/form/text/raw")),
+		mcp.WithBoolean("req_body_is_json_schema", mcp.Description("请求体是否为 JSON Schema")),
+		mcp.WithBoolean("res_body_is_json_schema", mcp.Description("响应体是否为 JSON Schema")),
+		mcp.WithString("tag", mcp.Description("标签，JSON 数组格式")),
+		mcp.WithString("req_headers", mcp.Description("请求头，JSON 数组格式")),
 	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		args := req.GetArguments()
+		if tag, ok := args["tag"].(string); ok && tag != "" {
+			var tags []string
+			if json.Unmarshal([]byte(tag), &tags) == nil {
+				args["tag"] = tags
+			}
+		}
+		if headers, ok := args["req_headers"].(string); ok && headers != "" {
+			var hdrs []any
+			if json.Unmarshal([]byte(headers), &hdrs) == nil {
+				args["req_headers"] = hdrs
+			}
+		}
 		result, err := client.UpdateInterface(args)
 		if err != nil {
 			return errorResult(err.Error()), nil
