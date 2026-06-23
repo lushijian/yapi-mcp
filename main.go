@@ -249,6 +249,7 @@ func main() {
 		mcp.WithBoolean("res_body_is_json_schema", mcp.Description("响应体是否为 JSON Schema")),
 		mcp.WithString("tag", mcp.Description("标签，JSON 数组格式，如 [\"tag1\",\"tag2\"]")),
 		mcp.WithString("req_headers", mcp.Description("请求头，JSON 数组格式，如 [{\"name\":\"Content-Type\",\"value\":\"application/json\"}]")),
+		mcp.WithString("req_query", mcp.Description("请求参数 Query，JSON 数组格式，如 [{\"name\":\"orderId\",\"required\":\"1\",\"example\":\"123\"}]")),
 	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		args := req.GetArguments()
 		// parse JSON string args to native types
@@ -262,6 +263,12 @@ func main() {
 			var hdrs []any
 			if json.Unmarshal([]byte(headers), &hdrs) == nil {
 				args["req_headers"] = hdrs
+			}
+		}
+		if query, ok := args["req_query"].(string); ok && query != "" {
+			var qs []any
+			if json.Unmarshal([]byte(query), &qs) == nil {
+				args["req_query"] = qs
 			}
 		}
 		result, err := client.CreateInterface(args)
@@ -289,6 +296,7 @@ func main() {
 		mcp.WithBoolean("res_body_is_json_schema", mcp.Description("响应体是否为 JSON Schema")),
 		mcp.WithString("tag", mcp.Description("标签，JSON 数组格式")),
 		mcp.WithString("req_headers", mcp.Description("请求头，JSON 数组格式")),
+		mcp.WithString("req_query", mcp.Description("请求参数 Query，JSON 数组格式")),
 	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		args := req.GetArguments()
 		if tag, ok := args["tag"].(string); ok && tag != "" {
@@ -301,6 +309,12 @@ func main() {
 			var hdrs []any
 			if json.Unmarshal([]byte(headers), &hdrs) == nil {
 				args["req_headers"] = hdrs
+			}
+		}
+		if query, ok := args["req_query"].(string); ok && query != "" {
+			var qs []any
+			if json.Unmarshal([]byte(query), &qs) == nil {
+				args["req_query"] = qs
 			}
 		}
 		result, err := client.UpdateInterface(args)
