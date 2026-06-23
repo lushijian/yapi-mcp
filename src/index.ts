@@ -12,6 +12,7 @@ interface Config {
   baseUrl: string;
   email: string;
   password: string;
+  loginPath?: string;
 }
 
 // 尝试从配置文件读取配置
@@ -45,6 +46,7 @@ const fileConfig = loadConfig();
 const YAPI_BASE_URL = process.env.YAPI_BASE_URL || fileConfig?.baseUrl;
 const YAPI_EMAIL = process.env.YAPI_EMAIL || fileConfig?.email;
 const YAPI_PASSWORD = process.env.YAPI_PASSWORD || fileConfig?.password;
+const YAPI_LOGIN_PATH = process.env.YAPI_LOGIN_PATH || fileConfig?.loginPath;
 
 if (!YAPI_BASE_URL) {
   console.error("Error: YAPI_BASE_URL is required. Set it via environment variable or yapi-interface-mcp.config.json");
@@ -62,6 +64,7 @@ const yapiClient = new YapiClient({
   baseUrl: YAPI_BASE_URL,
   email: YAPI_EMAIL,
   password: YAPI_PASSWORD,
+  loginPath: YAPI_LOGIN_PATH,
 });
 
 // 从 package.json 读取版本

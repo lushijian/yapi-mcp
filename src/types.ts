@@ -2,6 +2,7 @@ export interface YapiConfig {
   baseUrl: string;
   email: string;
   password: string;
+  loginPath?: string;
 }
 
 export interface YapiLoginResponse {

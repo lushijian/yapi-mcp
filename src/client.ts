@@ -16,17 +16,19 @@ export class YapiClient {
   private cookies: string | null = null;
   private uid: number | null = null;
   private loginCredentials: { email: string; password: string };
+  private loginPath: string;
 
   constructor(config: YapiConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
     this.loginCredentials = { email: config.email, password: config.password };
+    this.loginPath = config.loginPath || "/api/user/login";
   }
 
   /**
    * 通过邮箱和密码登录，获取 cookie
    */
   async login(email: string, password: string): Promise<void> {
-    const url = new URL(`${this.baseUrl}/api/user/login`);
+    const url = new URL(`${this.baseUrl}${this.loginPath}`);
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
