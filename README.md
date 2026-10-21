@@ -5,6 +5,7 @@ YAPI 接口管理平台的 MCP (Model Context Protocol) 服务器，Go 实现。
 ## 功能特性
 
 - 项目查询、项目列表
+- 全局搜索项目、分组和接口
 - 接口分类查询、新增分类
 - 接口列表、接口详情、新增接口、修改接口
 - Cookie 认证，支持标准登录和 LDAP 登录
@@ -99,7 +100,8 @@ yapi-mcp
 |---------|---------|---------|
 | `yapi-get-version` | 获取版本信息 | - |
 | `yapi-get-project` | 获取项目信息 | `projectId` |
-| `yapi-get-project-list` | 获取项目列表 | - |
+| `yapi-get-project-list` | 获取项目列表，不传分组ID时返回当前用户可见的全部项目 | `groupId`（可选） |
+| `yapi-global-search` | 全局搜索项目、分组和接口 | `keyword` |
 | `yapi-get-categories` | 获取接口分类列表 | `projectId` |
 | `yapi-get-interfaces-by-category` | 获取分类下接口列表 | `catid` |
 | `yapi-get-interfaces` | 获取项目所有接口 | `projectId` |

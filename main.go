@@ -144,12 +144,42 @@ func main() {
 	// 2. get project list
 	s.AddTool(mcp.NewTool("yapi-get-project-list",
 		mcp.WithDescription("获取 YAPI 项目列表"),
+		mcp.WithNumber("groupId", mcp.Description("项目分组ID，不传则返回当前用户可见的全部项目")),
 	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		projects, err := client.GetProjectList()
+		groupID := int(req.GetInt("groupId", 0))
+		if groupID < 0 {
+			return errorResult("groupId must be positive"), nil
+		}
+		var projects []YapiProject
+		var err error
+		if groupID > 0 {
+			projects, err = client.GetProjectList(groupID)
+		} else {
+			projects, err = client.GetProjectList()
+		}
 		if err != nil {
 			return errorResult(err.Error()), nil
 		}
 		return resultJSON(projects), nil
+	})
+
+	// 2.1 global search
+	s.AddTool(mcp.NewTool("yapi-global-search",
+		mcp.WithDescription("调用 YApi 网页端的全局搜索，返回匹配的项目、分组和接口"),
+		mcp.WithString("keyword",
+			mcp.Required(),
+			mcp.Description("搜索关键词，匹配项目名称、分组名称、接口标题或接口路径"),
+		),
+	), func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		keyword, err := req.RequireString("keyword")
+		if err != nil || strings.TrimSpace(keyword) == "" {
+			return errorResult("keyword is required"), nil
+		}
+		result, err := client.GlobalSearch(keyword)
+		if err != nil {
+			return errorResult(err.Error()), nil
+		}
+		return resultJSON(result), nil
 	})
 
 	// 3. get categories
